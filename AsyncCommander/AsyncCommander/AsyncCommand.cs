@@ -44,14 +44,23 @@ namespace AsyncCommander
     {
 
         private List<Command> commands;
-        public bool executeAllAsynchronously { get; set; }
-        public bool undoAllAsynchronously { get; set; }
+        private bool executeAllAsynchronously { get; set; }
+        private bool undoAllAsynchronously { get; set; }
+
+        
 
         public MacroCommand(bool executeAllAsynchronously = true, bool undoAllAsynchronously = true)
         {
             this.executeAllAsynchronously = executeAllAsynchronously;
             this.undoAllAsynchronously = undoAllAsynchronously;
             commands = new List<Command>();
+        }
+
+        public MacroCommand(bool executeAllAsynchronously, bool undoAllAsynchronously, Command command, params Command[] additionalCommands)
+            : this(command, additionalCommands)
+        {
+            this.executeAllAsynchronously = executeAllAsynchronously;
+            this.undoAllAsynchronously = undoAllAsynchronously;
         }
 
         public MacroCommand(Command command, params Command[] additionalCommands)
@@ -73,6 +82,13 @@ namespace AsyncCommander
                     }
                 }
             }
+        }
+
+        public MacroCommand setAsynchronousAll(bool isAsynchronousAll)
+        {
+            this.executeAllAsynchronously = isAsynchronousAll;
+            this.undoAllAsynchronously = isAsynchronousAll;
+            return this;
         }
 
         public void addCommand(Command command)

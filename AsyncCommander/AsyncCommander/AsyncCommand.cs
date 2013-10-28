@@ -44,9 +44,13 @@ namespace AsyncCommander
     {
 
         private List<Command> commands;
+        public bool executeAllAsynchronously { get; set; }
+        public bool undoAllAsynchronously { get; set; }
 
-        public MacroCommand()
+        public MacroCommand(bool executeAllAsynchronously = true, bool undoAllAsynchronously = true)
         {
+            this.executeAllAsynchronously = executeAllAsynchronously;
+            this.undoAllAsynchronously = undoAllAsynchronously;
             commands = new List<Command>();
         }
 
@@ -91,7 +95,14 @@ namespace AsyncCommander
             {
                 foreach (Command command in commands)
                 {
-                    command.execute();
+                    if (executeAllAsynchronously)
+                    {
+                        command.executeAsynchronously();
+                    }
+                    else
+                    {
+                        command.execute();
+                    }
                 }
             }
         }
@@ -102,54 +113,16 @@ namespace AsyncCommander
             {
                 foreach (Command command in commands)
                 {
-                    command.undo();
+                    if (undoAllAsynchronously)
+                    {
+                        command.undoAsynchronously();
+                    }
+                    else
+                    {
+                        command.undo();
+                    }
                 }
             }
-        }
-
-
-        public void executeAllAsynchronously()
-        {
-            if (commands != null && commands.Count > 0)
-            {
-                foreach (Command command in commands)
-                {
-                    command.executeAsynchronously();
-                }
-            }
-        }
-
-        public void undoAllAsynchronously()
-        {
-            if (commands != null && commands.Count > 0)
-            {
-                foreach (Command command in commands)
-                {
-                    command.undoAsynchronously();
-                }
-            }
-        }
-
-
-
-
-
-        private delegate void AsynchronouslyExecuteAllAsynchronouslyCommandFunctionDelegate();
-        private AsynchronouslyExecuteAllAsynchronouslyCommandFunctionDelegate asynchronouslyExecuteAllAsynchronouslyCommandFunctionDelegate;
-
-        public void asynchronouslyExecuteAllAsynchronously()
-        {
-            asynchronouslyExecuteAllAsynchronouslyCommandFunctionDelegate = new AsynchronouslyExecuteAllAsynchronouslyCommandFunctionDelegate(this.executeAllAsynchronously);
-            asynchronouslyExecuteAllAsynchronouslyCommandFunctionDelegate.BeginInvoke(null, null);
-        }
-
-        private delegate void AsynchronouslyUndoAllCommandFunctionDelegate();
-        private AsynchronouslyUndoAllCommandFunctionDelegate asynchronouslyUndoCommandFunctionDelegate;
-
-        public void asynchronouslyUndoAllAsynchronously()
-        {
-            asynchronouslyUndoCommandFunctionDelegate = new AsynchronouslyUndoAllCommandFunctionDelegate(this.undoAllAsynchronously);
-            asynchronouslyUndoCommandFunctionDelegate.BeginInvoke(null, null);
         }
     }
 
